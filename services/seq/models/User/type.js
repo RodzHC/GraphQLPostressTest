@@ -5,12 +5,14 @@ const {
 const {
 	attributeFields
 } = require('graphql-sequelize');
-const sequelize = require("../build-db")();
-const Sequelize = require('sequelize');
+
 const
-	User = require('./index')(sequelize, Sequelize);
-module.exports = new GraphQLObjectType({
-	name: 'User',
-	description: 'Users infos',
-	fields: attributeFields(User)
-});
+	User = require('./index');
+
+module.exports = function (...args) {
+	return new GraphQLObjectType({
+		name: 'User',
+		description: 'Users infos',
+		fields: attributeFields(User(...args))
+	});
+}

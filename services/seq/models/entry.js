@@ -1,3 +1,5 @@
+const sequelize = require("./build-db")();
+const Sequelize = require('sequelize');
 const bodyParser = require('body-parser');
 const {
 	graphqlExpress,
@@ -7,12 +9,12 @@ const logger = require('../helpers/logger');
 var {
 	NODE_ENV
 } = process.env;
-console.log(NODE_ENV);
+
 if (!NODE_ENV) {
 	NODE_ENV = 'development';
 }
 module.exports = function (app) {
-	const schema = require('./User/schema');
+	const schema = require('./User/schema')(sequelize, Sequelize);
 	app.use('/graphql', bodyParser.json(), (req, res, next) =>
 		graphqlExpress({
 			schema,
