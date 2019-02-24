@@ -1,32 +1,29 @@
-const sequelize = require("./build-db")();
-const Sequelize = require('sequelize');
-const bodyParser = require('body-parser');
-const {
-	graphqlExpress,
-	graphiqlExpress
-} = require('apollo-server-express');
-const logger = require('../helpers/logger');
-var {
-	NODE_ENV
-} = process.env;
+const sequelizeConnection = require("./build-db")();
+const bodyParser = require("body-parser");
+const { graphqlExpress, graphiqlExpress } = require("apollo-server-express");
+const logger = require("../helpers/logger");
+var { NODE_ENV } = process.env;
 
 if (!NODE_ENV) {
-	NODE_ENV = 'development';
+  NODE_ENV = "development";
 }
-module.exports = function (app) {
-	const schema = require('./User/schema')(sequelize, Sequelize);
-	app.use('/graphql', bodyParser.json(), (req, res, next) =>
-		graphqlExpress({
-			schema,
-			context: {
-				user: req.user
-			}
-		})(req, res, next)
-	);
-	if (NODE_ENV === 'development') {
-		app.get('/graphiql', graphiqlExpress({
-			endpointURL: '/graphql'
-		}));
-	}
-	logger.info(`Running a GraphQL API server at /graphql`);
-}
+const userSchema = require("./User/schema")(sequelizeConnection);
+module.exports = function(app) {
+  app.use("/graphql", bodyParser.json(), (req, res, next) =>
+    graphqlExpress({
+      userSchema,
+      context: {
+        user: req.user
+      }
+    })(req, res, next)
+  );
+  if (NODE_ENV === "development") {
+    app.get(
+      "/graphiql",
+      graphiqlExpress({
+        endpointURL: "/graphql"
+      })
+    );
+  }
+  logger.info(`Running a GraphQL API server at /graphql`);
+};
