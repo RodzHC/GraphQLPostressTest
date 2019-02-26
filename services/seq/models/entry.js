@@ -1,31 +1,28 @@
 const sequelizeConnection = require("./build-db")();
 const bodyParser = require("body-parser");
-const { ApolloServer, gql } = require("apollo-server-express");
+const {
+	ApolloServer,
+	gql
+} = require("apollo-server-express");
 const logger = require("../helpers/logger");
-var { NODE_ENV } = process.env;
+var {
+	NODE_ENV
+} = process.env;
 if (!NODE_ENV) {
-  NODE_ENV = "development";
+	NODE_ENV = "development";
 }
-const userSchema = require("./User/schema")(sequelizeConnection);
+const schema = require("./User/schema")(sequelizeConnection);
 
-module.exports = function(app) {
-  const server = new ApolloServer({typeDefs: ,
-  resolvers:});
-  //   app.use("/graphql", bodyParser.json(), (req, res, next) =>
-  //     graphqlExpress({
-  //       userSchema,
-  //       context: {
-  //         user: req.user
-  //       }
-  //     })(req, res, next)
-  //   );
-  //   if (NODE_ENV === "development") {
-  //     app.get(
-  //       "/graphiql",
-  //       graphiqlExpress({
-  //         endpointURL: "/graphql"
-  //       })
-  //     );
-  //   }
-  //   logger.info(`Running a GraphQL API server at /graphql`);
-};
+module.exports = function (app) {
+	const server = new ApolloServer({
+		schema
+	});
+	server.applyMiddleware({
+		app
+	});
+	app.listen({
+			port: 4000
+		}, () =>
+		console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
+	)
+}
