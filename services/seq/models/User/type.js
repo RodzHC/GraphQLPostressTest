@@ -9,7 +9,6 @@ const {
 const User = require("./index");
 
 module.exports = function (sequelizeUser) {
-	console.log(typeof attributeFields(sequelizeUser));
 	return new GraphQLObjectType({
 		name: "User",
 		description: "Users infos",

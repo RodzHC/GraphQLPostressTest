@@ -1,0 +1,15 @@
+version: "3"
+services:
+  postgres-db:
+    container_name: postdb
+    build: .
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+    volumes:
+      - 'pgdata:/var/lib/postgresql/data'
+volumes:
+  pgdata:
+

@@ -9,7 +9,6 @@ var userType = require("./type");
 module.exports = sequelizeConnection => {
 	sequelizeUser = sequelizeUser(sequelizeConnection);
 	userType = userType(sequelizeUser);
-	console.log(queries(sequelizeUser, userType));
 	return new GraphQLSchema({
 		query: new GraphQLObjectType({
 			name: "RootQuery",
