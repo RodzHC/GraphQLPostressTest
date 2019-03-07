@@ -4,19 +4,18 @@ const {
 	ApolloServer,
 	gql
 } = require("apollo-server-express");
-const logger = require("../helpers/logger");
-var {
-	NODE_ENV
-} = process.env;
-if (!NODE_ENV) {
-	NODE_ENV = "development";
-}
-const schema = require("./User/schema")(sequelizeConnection);
+// const logger = require("../helpers/logger");
 
+// const schema = require("../helpers/sequelizeLoader")(sequelizeConnection);
+
+// const schema = require('./decorate-db')(sequelizeConnection).sequelize;
+const schema = require('./Client/schema')(sequelizeConnection);
 module.exports = function (app) {
+	console.log(schema);
 	const server = new ApolloServer({
 		schema
 	});
+	console.log(server);
 	server.applyMiddleware({
 		app
 	});
