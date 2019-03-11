@@ -8,10 +8,10 @@ const {
 
 const User = require("./index");
 
-module.exports = function (sequelizeUser) {
+module.exports = function (sequelizeSchema) {
 	return new GraphQLObjectType({
-		name: "User",
-		description: "Users infos",
-		fields: attributeFields(sequelizeUser)
+		name: "Client",
+		description: "Clients infos",
+		fields: attributeFields(sequelizeSchema)
 	});
 };
