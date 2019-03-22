@@ -18,6 +18,7 @@ module.exports = {
 		});
 	},
 	down(migration) {
-		return migration.dropAllTables();
+		return Promisse.all([migration.dropAllTables(),migration.dropAllEnums()
+]);
 	}
 }

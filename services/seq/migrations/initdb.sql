@@ -17,7 +17,7 @@ CREATE TABLE Machine (
 );
 -- SS 
 CREATE TABLE Client (
-		id int NOT NULL,
+		id SERIAL,
 		full_name varchar,
 		email varchar NOT NULL,
 		email_confirmation boolean DEFAULT false,
@@ -47,7 +47,7 @@ CREATE TABLE Merchant (
 
 CREATE TABLE Impersonate (
 		id int NOT NULL,
-		user_id varchar,
+		user_id int,
 		merchant_id int,
 		status varchar,
 		createdAt timestamp,
@@ -64,23 +64,24 @@ CREATE TABLE City(
 		name varchar,
 		PRIMARY KEY(code)
 );
+CREATE TYPE category AS ENUM('someCategory','anotherCategory');
 
 CREATE TABLE Company (
+
 		id int NOT NULL,
 		cnpj int,
-		category_id ENUM('someCategory','anotherCategory') ,
+		category_id category ,
 		PRIMARY KEY (id)
 ) INHERITS (client);
 
 ALTER TABLE machine ADD FOREIGN KEY (merchant_id) REFERENCES merchant (id);
 
-ALTER TABLE client ADD FOREIGN KEY (country_code) REFERENCES countries (code);
+ALTER TABLE client ADD FOREIGN KEY (country_code) REFERENCES countrie (code);
 
-ALTER TABLE merchant ADD FOREIGN KEY (id) REFERENCES merchant (admin_id);
 
 ALTER TABLE transaction ADD FOREIGN KEY (machine_id) REFERENCES machine (id);
 
-ALTER TABLE impersonate ADD FOREIGN KEY (merchant_id) REFERENCES merchant (id);
-
 ALTER TABLE impersonate ADD FOREIGN KEY (user_id) REFERENCES client  (id);
+ALTER TABLE impersonate ADD FOREIGN KEY (merchant_id) REFERENCES client (id);
+
 
