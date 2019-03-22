@@ -1,33 +1,13 @@
-const {
-	makeExecutableSchema
-} = require('graphql-tools');
-const {
-	GraphQLObjectType,
-	GraphQLSchema
-} = require("graphql");
+const { printType } = require("graphql");
+const { makeExecutableSchema } = require("graphql-tools");
+const { DateType } = require("graphql-sequelize");
 
-// const queries = require("./Client/queries");
-// const mutations = require("./Client/mutations");
-// var sequelizeUser = require("./Client/index");
-// var userType = require("./Client/types");
-
-const {
-	graphqlLoader
-} = require('../helpers/loaders');
-
+const { graphqlLoader } = require("../helpers/loaders");
 
 module.exports = sequelizeConnection => {
-
-
-	const obj = graphqlLoader(sequelizeConnection, __dirname);
-	return new GraphQLSchema({
-		query: new GraphQLObjectType({
-			name: "RootQuery",
-			fields: obj.queries
-		}),
-		mutation: new GraphQLObjectType({
-			name: "RootMutation",
-			fields: obj.mutations
-		})
-	});
+  const obj = graphqlLoader(sequelizeConnection, __dirname);
+  return makeExecutableSchema({
+    typeDefs: [printType(DateType.default), ...obj.typeDefs],
+    resolvers: obj.resolvers
+  });
 };

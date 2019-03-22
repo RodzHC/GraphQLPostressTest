@@ -1,10 +1,10 @@
 const { GraphQLNonNull, GraphQLString } = require("graphql");
 const { resolver } = require("graphql-sequelize");
 
-module.exports = ({ Client }) => {
+module.exports = (User, userType) => {
   return {
     createUser: {
-      type: Client,
+      type: userType,
       args: {
         name: {
           description: "Unique username",
@@ -14,6 +14,20 @@ module.exports = ({ Client }) => {
           description: "Password",
           type: new GraphQLNonNull(GraphQLString)
         }
+      },
+      resolve: async function(root, { name, password }, context, info) {
+        const user = await User.create({
+          name,
+          password
+        });
+        return await resolver(User)(
+          root,
+          {
+            id: user.id
+          },
+          context,
+          info
+        );
       }
     }
   };
