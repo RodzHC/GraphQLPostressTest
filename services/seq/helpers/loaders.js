@@ -1,70 +1,117 @@
-var fs = require('fs');
-const {
-	merge
-} = require('lodash');
+var fs = require("fs");
+const { merge } = require("lodash");
+const { printType } = require("graphql");
+("use strict");
+const { GraphQLObjectType } = require("graphql");
 
-'use strict';
-
-const path = require('path');
-const Sequelize = require('sequelize');
+const path = require("path");
+const Sequelize = require("sequelize");
 const basename = path.basename(__filename);
 const db = {};
 
+module.exports.sequelizeLoader = function(sequelizeConnection, dirname) {
+  fs.readdirSync(dirname)
+    .filter(file => {
+      return (
+        file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
+      );
+    })
+    .forEach(file => {
+      const model = sequelize["import"](path.join(dirname, file));
+      db[model.name] = model;
+    });
 
-module.exports.sequelizeLoader = function (sequelizeConnection, dirname) {
+  Object.keys(db).forEach(modelName => {
+    if (db[modelName].associate) {
+      db[modelName].associate(db);
+    }
+  });
 
+  db.sequelize = sequelize;
+  db.Sequelize = Sequelize;
 
-	fs
-		.readdirSync(dirname)
-		.filter(file => {
-			return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
-		})
-		.forEach(file => {
-			const model = sequelize['import'](path.join(dirname, file));
-			db[model.name] = model;
-		});
+  return db;
+};
+module.exports.graphqlLoader = function(sequelizeConnection, dirname) {
+  var obj = {
+    typeDefs: [],
+    resolvers: {}
+  };
+  var db = {};
+  var queries = {};
+  var mutations = {};
 
-	Object.keys(db).forEach(modelName => {
-		if (db[modelName].associate) {
-			db[modelName].associate(db);
-		}
-	});
+  fs.readdirSync(dirname).forEach(function(pathName) {
+    try {
+      if (fs.statSync(path.join(dirname, pathName)).isDirectory()) {
+        console.log(`Loading ${pathName} Types... `);
+        //Initialize Sequelize
+        const sequelizeSchema = require(path.join(dirname, pathName))(
+          sequelizeConnection,
+          Sequelize
+        );
+        //SS for Sequelize Schema
+        const schemaName = pathName + "SS";
+        db[schemaName] = sequelizeSchema;
 
-	db.sequelize = sequelize;
-	db.Sequelize = Sequelize;
+        typeAux = require(path.join(dirname, pathName, "types"))(
+          sequelizeSchema
+        );
 
-	return db;
+        db[pathName] = typeAux;
+        obj.typeDefs.push(printType(typeAux));
+        console.log("OK");
+      }
+    } catch (error) {
+      if (error.code === "MODULE_NOT_FOUND") {
+        console.log(pathName + " do not have a Type.");
+      } else {
+        console.log(error);
+      }
+    }
+  });
 
-}
-module.exports.graphqlLoader = function (sequelizeConnection, dirname) {
-	var obj = {
-		typeDefs: {}
-	};
-	console.log('Reading directory at: ' + dirname);
-	console.log(fs.readdirSync(dirname));
-	fs.readdirSync(dirname).forEach(function (pathName) {
-		try {
-			if (fs.statSync(path.join(dirname, pathName)).isDirectory()) {
-				console.log(`Loading ${pathName} Types: `)
-				console.log(path.join(dirname, pathName) + "/types");
-				//Initialize Sequelize
-				const sequelizeSchema = require(path.join(dirname, pathName))(sequelizeConnection, Sequelize);
+  /*
+   *Load Queries and Mutations
+   */
+  console.log("Loading Queries-Mutations");
+  fs.readdirSync(dirname).forEach(function(pathName) {
+    try {
+      if (fs.statSync(path.join(dirname, pathName)).isDirectory()) {
+        queriesAux = require(path.join(dirname, pathName, "queries"))(db);
+        queries = merge(queries, queriesAux);
+        mutationsAux = require(path.join(dirname, pathName, "mutations"))(db);
+        mutations = merge(mutations, queriesAux);
+        //Load Resolvers
+      }
+    } catch (error) {
+      if (error.code === "MODULE_NOT_FOUND") {
+        console.log(
+          "Model " + pathName + " don't have a Querie, Mutation or Resolver."
+        );
+      } else {
+        console.log(error);
+      }
+    }
+  });
 
-				//Load Types
-				console.log('loading path types: ' + path.join(dirname, pathName, 'types'));
-				typeAux =
-					require(path.join(dirname, pathName, 'types'))(sequelizeSchema);
-				console.log('TYPEAUX ------>');
-				console.log(JSON.parse(JSON.stringify(typeAux)));
-				//obj.typeDefs[typeAux.] = ;
-				//Load resolvers
-				obj.resolvers = {};
-			}
-		} catch (error) {
-			console.log(pathName + " do not have a type !");
-		}
-
-	});
-
-	return obj;
-}
+  obj.typeDefs.push(
+    printType(
+      new GraphQLObjectType({
+        name: "Query",
+        description: "Root Query Type",
+        fields: queries
+      })
+    )
+  );
+  obj.typeDefs.push(
+    printType(
+      new GraphQLObjectType({
+        name: "Mutation",
+        description: "Root Mutation Type",
+        fields: mutations
+      })
+    )
+  );
+  return obj;
+};
