@@ -4,24 +4,26 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db:reload": "sequelize db:migrate:undo:all && sequelize db:migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "apollo-server": "^2.4.6",
-    "apollo-server-express": "^2.4.2",
+    "apollo-server": "^2.4.8",
+    "apollo-server-express": "^2.4.8",
     "body-parser": "^1.18.3",
     "crypto": "^1.0.1",
     "express": "^4.16.4",
     "graphql": "^14.1.1",
-    "graphql-relay": "^0.6.0",
-    "graphql-sequelize": "^9.3.3",
+    "graphql-relay": "^0.5.5",
+    "graphql-sequelize": "^9.3.4",
     "graphql-tools": "^4.0.4",
-    "jsonwebtoken": "^8.5.0",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
-    "pg": "^7.8.1",
-    "sequelize": "^4.42.0",
+    "pg": "^7.9.0",
+    "sequelize": "^5.1.1",
+    "signale": "^1.4.0",
     "winston": "^3.2.1"
   }
 }

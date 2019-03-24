@@ -6,6 +6,9 @@ const { resolver } = require("graphql-sequelize");
 //const sort = require('../../helpers/sort');
 module.exports = ({ Client }) => {
   return {
+    test: {
+      type: GraphQLString
+    },
     user: {
       type: Client,
       args: {

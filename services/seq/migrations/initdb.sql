@@ -2,7 +2,7 @@ CREATE TABLE Transaction (
 		id int NOT NULL,
 		machine_id int NOT NULL,
 		status varchar,
-		createdAt timestamp,
+		created_at timestamp,
 		PRIMARY KEY (id)
 );
 
@@ -12,7 +12,7 @@ CREATE TABLE Machine (
 		serial_number varchar NOT NULL,
 		price DECIMAL(13,2),
 		status varchar,
-		createdAt timestamp,
+		created_at timestamp,
 		PRIMARY KEY (id)
 );
 -- SS 
@@ -24,10 +24,11 @@ CREATE TABLE Client (
 		password varchar,
 		password_salt varchar,
 		status varchar,
-		createdAt timestamp,
 		is_vendor boolean DEFAULT false,
-		last_loggin timestamp,
 		country_code int,
+		last_loggin timestamp,
+		created_at timestamp,
+		updated_at timestamp,
 		PRIMARY KEY (id)
 );
 CREATE TABLE Customer(
@@ -41,7 +42,7 @@ CREATE TABLE Merchant (
 		admin_id int,
 		merchant_name varchar,
 		merchant_status varchar,
-		createdAt varchar,
+		created_at timestamp,
 		PRIMARY KEY (id)
 );
 
@@ -50,7 +51,7 @@ CREATE TABLE Impersonate (
 		user_id int,
 		merchant_id int,
 		status varchar,
-		createdAt timestamp,
+		created_at timestamp,
 		PRIMARY KEY (id)
 );
 

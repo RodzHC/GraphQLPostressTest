@@ -83,6 +83,11 @@ module.exports.graphqlLoader = function(sequelizeConnection, dirname) {
         mutationsAux = require(path.join(dirname, pathName, "mutations"))(db);
         mutations = merge(mutations, queriesAux);
         //Load Resolvers
+        console.log(require(path.join(dirname, pathName, "resolvers"))(db));
+        obj.resolvers = merge(
+          obj.resolvers,
+          require(path.join(dirname, pathName, "resolvers"))(db)
+        );
       }
     } catch (error) {
       if (error.code === "MODULE_NOT_FOUND") {
